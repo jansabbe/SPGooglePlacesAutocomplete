@@ -75,23 +75,34 @@
 #pragma mark UITableViewDelegate
 
 - (void)recenterMapToPlacemark:(CLPlacemark *)placemark {
+    [self recenterMapToCoordinate:placemark.location.coordinate];
+
+}
+
+- (void)recenterMapToCoordinate:(CLLocationCoordinate2D)coordinate {
     MKCoordinateRegion region;
     MKCoordinateSpan span;
-    
+
     span.latitudeDelta = 0.02;
     span.longitudeDelta = 0.02;
-    
+
     region.span = span;
-    region.center = placemark.location.coordinate;
-    
+    region.center = coordinate;
+
     [self.mapView setRegion:region];
 }
 
 - (void)addPlacemarkAnnotationToMap:(CLPlacemark *)placemark addressString:(NSString *)address {
+    CLLocationCoordinate2D coordinate = placemark.location.coordinate;
+    [self addAnnotationWithTitle:address coordinate:coordinate];
+
+}
+
+- (void)addAnnotationWithTitle:(NSString *)address coordinate:(CLLocationCoordinate2D)coordinate {
     [self.mapView removeAnnotation:selectedPlaceAnnotation];
-    
+
     selectedPlaceAnnotation = [[MKPointAnnotation alloc] init];
-    selectedPlaceAnnotation.coordinate = placemark.location.coordinate;
+    selectedPlaceAnnotation.coordinate = coordinate;
     selectedPlaceAnnotation.title = address;
     [self.mapView addAnnotation:selectedPlaceAnnotation];
 }
@@ -110,7 +121,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SPGooglePlacesAutocompletePlace *place = [self placeAtIndexPath:indexPath];
-    [place resolveToPlacemark:^(CLPlacemark *placemark, NSString *addressString, NSError *error) {
+    [place resolveToLocation:^(CLLocation *location, NSError *error) {
         if (error) {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Could not map selected Place"
                                                             message:error.localizedDescription
@@ -118,9 +129,9 @@
                                                   cancelButtonTitle:@"OK"
                                                   otherButtonTitles:nil, nil];
             [alert show];
-        } else if (placemark) {
-            [self addPlacemarkAnnotationToMap:placemark addressString:addressString];
-            [self recenterMapToPlacemark:placemark];
+        } else if (location) {
+            [self addAnnotationWithTitle:@"From Google Places API" coordinate:location.coordinate];
+            [self recenterMapToCoordinate:location.coordinate];
             [self dismissSearchControllerWhileStayingActive];
             [self.searchDisplayController.searchResultsTableView deselectRowAtIndexPath:indexPath animated:NO];
         }

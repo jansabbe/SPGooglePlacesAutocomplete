@@ -46,4 +46,5 @@
  */
 - (void)resolveToPlacemark:(SPGooglePlacesPlacemarkResultBlock)block;
 
+- (void)resolveToLocation:(SPGooglePlacesLocationResultBlock)block;
 @end
