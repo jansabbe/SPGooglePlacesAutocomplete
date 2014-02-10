@@ -121,7 +121,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SPGooglePlacesAutocompletePlace *place = [self placeAtIndexPath:indexPath];
-    [place resolveToLocation:^(CLLocation *location, NSError *error) {
+    [place resolveToLocation:^(CLLocation *location, NSString*address, NSError *error) {
         if (error) {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Could not map selected Place"
                                                             message:error.localizedDescription
@@ -130,7 +130,7 @@
                                                   otherButtonTitles:nil, nil];
             [alert show];
         } else if (location) {
-            [self addAnnotationWithTitle:@"From Google Places API" coordinate:location.coordinate];
+            [self addAnnotationWithTitle:address coordinate:location.coordinate];
             [self recenterMapToCoordinate:location.coordinate];
             [self dismissSearchControllerWhileStayingActive];
             [self.searchDisplayController.searchResultsTableView deselectRowAtIndexPath:indexPath animated:NO];

@@ -86,13 +86,13 @@
     query.reference = self.reference;
     [query fetchPlaceDetail:^(NSDictionary *placeDictionary, NSError *error) {
         if (error) {
-            block(nil, error);
+            block(nil, nil, error);
         } else {
             NSNumber *latitude = [placeDictionary valueForKeyPath:@"geometry.location.lat"];
             NSNumber *longitude = [placeDictionary valueForKeyPath:@"geometry.location.lng"];
             CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue]
                                                               longitude:[longitude doubleValue]];
-            block(location, nil);
+            block(location, self.name, nil);
         }
     }];
 
